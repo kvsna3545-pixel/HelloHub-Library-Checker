@@ -5,92 +5,222 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HelloHub | Library Checker</title>
+
 <style>
 :root{
---bg:#090812;--panel:#141220;--panel2:#1c192b;
---border:#302943;--text:#f4efff;--muted:#a49ab8;
---pink:#ff73c3;--purple:#a069ff;
---green:#55dfa0;--red:#ff647d;--yellow:#ffd36b;
+--bg:#090812;
+--panel:#141220;
+--panel2:#1c192b;
+--border:#302943;
+--text:#f4efff;
+--muted:#a49ab8;
+--pink:#ff73c3;
+--purple:#a069ff;
+--green:#55dfa0;
+--red:#ff647d;
+--yellow:#ffd36b;
 }
+
 *{box-sizing:border-box}
+
 body{
-margin:0;background:var(--bg);color:var(--text);
-font-family:Inter,system-ui,sans-serif
+margin:0;
+background:var(--bg);
+color:var(--text);
+font-family:Inter,system-ui,sans-serif;
 }
+
 header{
-height:70px;border-bottom:1px solid var(--border);
-display:flex;align-items:center;justify-content:space-between;
-padding:0 5%;background:#100d1a
+min-height:70px;
+border-bottom:1px solid var(--border);
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:14px 5%;
+background:#100d1a;
 }
-.logo{font-weight:900;font-size:21px}
+
+.logo{
+font-weight:900;
+font-size:21px;
+}
+
 .logo span{color:var(--pink)}
-.status{color:var(--green);font-size:13px}
-.layout{display:flex;min-height:calc(100vh - 70px)}
+
+.status{
+color:var(--green);
+font-size:13px;
+}
+
+.layout{
+display:flex;
+min-height:calc(100vh - 70px);
+}
+
 aside{
-width:220px;padding:25px 15px;
-border-right:1px solid var(--border)
+width:220px;
+padding:25px 15px;
+border-right:1px solid var(--border);
+flex-shrink:0;
 }
+
 .nav{
-padding:13px;border-radius:10px;color:var(--muted);
-margin-bottom:7px;font-size:14px
+padding:13px;
+border-radius:10px;
+color:var(--muted);
+margin-bottom:7px;
+font-size:14px;
 }
-.nav.active{background:#30213f;color:var(--pink)}
-main{flex:1;padding:35px;max-width:1200px}
-h1{font-size:29px;margin:0 0 8px}
-.sub{color:var(--muted);margin-bottom:25px}
+
+.nav.active{
+background:#30213f;
+color:var(--pink);
+}
+
+main{
+flex:1;
+padding:35px;
+max-width:1200px;
+min-width:0;
+}
+
+h1{
+font-size:29px;
+margin:0 0 8px;
+}
+
+.sub{
+color:var(--muted);
+margin-bottom:25px;
+}
+
 .cards{
-display:grid;grid-template-columns:repeat(3,1fr);
-gap:15px;margin-bottom:22px
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-bottom:22px;
 }
+
 .card,.editor,.results{
-background:var(--panel);border:1px solid var(--border);
-border-radius:15px;padding:20px
+background:var(--panel);
+border:1px solid var(--border);
+border-radius:15px;
+padding:20px;
 }
+
 .card small{color:var(--muted)}
-.card strong{display:block;font-size:23px;margin-top:9px}
-.section-title{font-weight:700;margin-bottom:13px}
+
+.card strong{
+display:block;
+font-size:23px;
+margin-top:9px;
+overflow-wrap:anywhere;
+}
+
+.section-title{
+font-weight:700;
+margin-bottom:13px;
+}
+
 textarea{
-width:100%;height:300px;resize:vertical;
-background:#0b0913;color:#e9dfff;
-border:1px solid var(--border);border-radius:10px;
-padding:15px;font:13px/1.7 monospace;outline:none
+width:100%;
+height:300px;
+resize:vertical;
+background:#0b0913;
+color:#e9dfff;
+border:1px solid var(--border);
+border-radius:10px;
+padding:15px;
+font:13px/1.7 monospace;
+outline:none;
 }
+
 textarea:focus{border-color:var(--purple)}
+
 .actions{
-display:flex;gap:10px;flex-wrap:wrap;margin-top:14px
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:14px;
 }
+
 button,.upload{
-border:0;border-radius:9px;padding:12px 18px;
+border:0;
+border-radius:9px;
+padding:12px 18px;
 background:linear-gradient(110deg,var(--pink),var(--purple));
-color:white;font-weight:700;cursor:pointer
+color:white;
+font-weight:700;
+cursor:pointer;
+font-size:13px;
 }
+
 button.secondary,.upload{
-background:var(--panel2);border:1px solid var(--border)
+background:var(--panel2);
+border:1px solid var(--border);
 }
+
+button:disabled{
+opacity:.5;
+cursor:not-allowed;
+}
+
 input[type=file]{display:none}
-.results{margin-top:20px;display:none}
+
+.results{
+margin-top:20px;
+display:none;
+}
+
 .result-head{
-display:flex;align-items:center;justify-content:space-between;
-gap:12px;margin-bottom:15px
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+margin-bottom:15px;
 }
+
 .pill{
-padding:7px 12px;border-radius:20px;
-font-size:12px;font-weight:800
+padding:7px 12px;
+border-radius:20px;
+font-size:12px;
+font-weight:800;
 }
+
 .ok{background:#153b2d;color:var(--green)}
 .warn{background:#44351b;color:var(--yellow)}
 .error{background:#451e2a;color:var(--red)}
+
 .issue{
-padding:13px;border-bottom:1px solid var(--border);
-font-size:13px;line-height:1.6
+padding:13px;
+border-bottom:1px solid var(--border);
+font-size:13px;
+line-height:1.6;
+overflow-wrap:anywhere;
 }
+
 .issue:last-child{border:0}
-.issue b{display:block;margin-bottom:3px}
-.issue small{color:var(--muted)}
-footer{
-padding:25px;color:var(--muted);
-text-align:center;font-size:12px
+
+.issue b{
+display:block;
+margin-bottom:3px;
 }
+
+.issue small{color:var(--muted)}
+
+.report-summary{
+color:var(--muted);
+font-size:13px;
+margin-bottom:12px;
+}
+
+footer{
+padding:25px;
+color:var(--muted);
+text-align:center;
+font-size:12px;
+}
+
 @media(max-width:750px){
 aside{display:none}
 main{padding:20px 14px}
@@ -99,6 +229,7 @@ h1{font-size:24px}
 }
 </style>
 </head>
+
 <body>
 
 <header>
@@ -107,6 +238,7 @@ h1{font-size:24px}
 </header>
 
 <div class="layout">
+
 <aside>
 <div class="nav active">◈ Library Checker</div>
 <div class="nav">▤ API Inspection</div>
@@ -115,69 +247,100 @@ h1{font-size:24px}
 </aside>
 
 <main>
+
 <h1>Library Checker</h1>
+
 <div class="sub">
 ตรวจสอบโครงสร้างและ API ของ HelloHub UI Library
 </div>
 
 <div class="cards">
+
 <div class="card">
 <small>Library Status</small>
 <strong id="statusCard">NOT CHECKED</strong>
 </div>
+
 <div class="card">
 <small>Issues Found</small>
 <strong id="issueCount">0</strong>
 </div>
+
 <div class="card">
 <small>Detected APIs</small>
 <strong id="apiCount">0 / 12</strong>
 </div>
+
 </div>
 
 <div class="editor">
+
 <div class="section-title">Source Code</div>
-<textarea id="source" spellcheck="false"
-placeholder="วางโค้ด HelloHub Luau ที่นี่..."></textarea>
+
+<textarea
+id="source"
+spellcheck="false"
+placeholder="วางโค้ด HelloHub Luau ที่นี่..."
+></textarea>
 
 <div class="actions">
+
 <button onclick="scan()">ตรวจสอบ Library</button>
+
 <label class="upload">
 เลือกไฟล์ .lua
 <input type="file" id="file" accept=".lua,.luau,.txt">
 </label>
+
 <button class="secondary" onclick="clearAll()">Clear</button>
+
 </div>
 </div>
 
 <div class="results" id="results">
+
 <div class="result-head">
 <div class="section-title">Inspection Report</div>
 <span class="pill" id="resultBadge">WAITING</span>
 </div>
+
+<div class="report-summary" id="reportSummary"></div>
+
 <div id="report"></div>
+
 <div class="actions">
 <button class="secondary" onclick="copyReport()">
 Copy Report
 </button>
 </div>
+
 </div>
+
 </main>
 </div>
 
 <footer>
-HelloHub Library Checker v1.1 · Luau Static Inspection
+HelloHub Library Checker v1.2 · Luau Static Inspection
 </footer>
 
 <script>
 const $ = id => document.getElementById(id);
+
 let lastReport = "";
 
 const API_LIST = [
-"CreateWindow","CreateTab","AddSection",
-"AddButton","AddToggle","AddSlider",
-"AddDropdown","AddLabel","Notify",
-"SetTheme","Reload","Destroy"
+"CreateWindow",
+"CreateTab",
+"AddSection",
+"AddButton",
+"AddToggle",
+"AddSlider",
+"AddDropdown",
+"AddLabel",
+"Notify",
+"SetTheme",
+"Reload",
+"Destroy"
 ];
 
 function addIssue(list,type,title,detail){
@@ -186,13 +349,19 @@ list.push({type,title,detail});
 
 function escapeHTML(s){
 return String(s).replace(/[&<>"']/g,c=>({
-"&":"&amp;","<":"&lt;",">":"&gt;",
-'"':"&quot;","'":"&#39;"
+"&":"&amp;",
+"<":"&lt;",
+">":"&gt;",
+'"':"&quot;",
+"'":"&#39;"
 })[c]);
 }
 
+/* FILE IMPORT */
+
 $("file").addEventListener("change",async e=>{
 const file=e.target.files[0];
+
 if(!file)return;
 
 if(file.size>2*1024*1024){
@@ -201,22 +370,33 @@ e.target.value="";
 return;
 }
 
+try{
 $("source").value=await file.text();
+}catch(error){
+alert("ไม่สามารถอ่านไฟล์ได้");
+}
+
 e.target.value="";
 });
 
+/* REMOVE COMMENTS AND STRINGS */
+
 function stripCode(src){
+
 let out="";
 let i=0;
 let state="normal";
 let longEnd="";
 
 while(i<src.length){
-const c=src[i],n=src[i+1];
+
+const c=src[i];
+const n=src[i+1];
 
 if(state==="normal"){
 
 if(c==="-"&&n==="-"){
+
 const m=src.slice(i).match(/^\-\-\[(=*)\[/);
 
 if(m){
@@ -239,6 +419,7 @@ continue;
 }
 
 if(c==="["){
+
 const m=src.slice(i).match(/^\[(=*)\[/);
 
 if(m){
@@ -256,33 +437,42 @@ continue;
 }
 
 if(state==="comment"){
+
 if(c==="\n"){
 state="normal";
 out+="\n";
 }
+
 i++;
 continue;
 }
 
 if(state==="longcomment"||state==="longstring"){
+
 if(src.slice(i,i+longEnd.length)===longEnd){
 i+=longEnd.length;
 state="normal";
 out+=" ";
 continue;
 }
+
 if(c==="\n")out+="\n";
+
 i++;
 continue;
 }
 
 if(state==="'"||state==='"'){
+
 if(c==="\\"){
 i+=2;
 continue;
 }
+
 if(c===state)state="normal";
+
 if(c==="\n")out+="\n";
+
 i++;
 }
 }
@@ -290,81 +480,301 @@ i++;
 return out;
 }
 
+/* BASIC BLOCK INSPECTION */
+
 function scanBlocks(clean,issues){
-const tokens=clean.match(
-/\b(function|if|for|while|do|repeat|end|until)\b/g
-)||[];
+
+const tokens=[];
+const pattern=/[A-Za-z_][A-Za-z0-9_]*/g;
+
+let match;
+
+while((match=pattern.exec(clean))!==null){
+
+const word=match[0];
+
+if([
+"function",
+"if",
+"for",
+"while",
+"do",
+"repeat",
+"end",
+"until"
+].includes(word)){
+
+const line=clean
+.slice(0,match.index)
+.split("\n").length;
+
+tokens.push({word,line});
+}
+}
 
 const stack=[];
-let pendingLoopDo=0;
 
 for(const token of tokens){
 
-if(token==="function"||token==="if"){
-stack.push(token);
+const word=token.word;
+
+if(word==="function"||word==="if"){
+
+stack.push({
+type:word,
+line:token.line
+});
+
 continue;
 }
 
-if(token==="for"||token==="while"){
-stack.push("loop");
-pendingLoopDo++;
+if(word==="for"||word==="while"){
+
+stack.push({
+type:"loop",
+waitingForDo:true,
+line:token.line
+});
+
 continue;
 }
 
-if(token==="do"){
-if(pendingLoopDo>0){
-pendingLoopDo--;
-}else{
-stack.push("do");
+if(word==="do"){
+
+let matchedLoop=false;
+
+for(let i=stack.length-1;i>=0;i--){
+
+if(
+stack[i].type==="loop"&&
+stack[i].waitingForDo
+){
+
+stack[i].waitingForDo=false;
+matchedLoop=true;
+break;
 }
+}
+
+if(!matchedLoop){
+
+stack.push({
+type:"do",
+line:token.line
+});
+}
+
 continue;
 }
 
-if(token==="repeat"){
-stack.push("repeat");
+if(word==="repeat"){
+
+stack.push({
+type:"repeat",
+line:token.line
+});
+
 continue;
 }
 
-if(token==="end"){
+if(word==="end"){
+
 const last=stack[stack.length-1];
 
-if(last==="repeat"){
+if(!last){
+
 addIssue(
-issues,"error","พบ end ในบล็อก repeat",
+issues,
+"error",
+"พบ end เกิน",
+"บรรทัด "+token.line+
+" ไม่มี Block ที่รอการปิด"
+);
+
+continue;
+}
+
+if(last.type==="repeat"){
+
+addIssue(
+issues,
+"error",
+"พบ end ในบล็อก repeat",
 "repeat ต้องปิดด้วย until"
 );
-}else if(last){
-stack.pop();
-}else{
-addIssue(
-issues,"error","พบ end เกิน",
-"ไม่มี Block ที่รอการปิด"
-);
-}
+
 continue;
 }
 
-if(token==="until"){
+stack.pop();
+continue;
+}
+
+if(word==="until"){
+
 const last=stack[stack.length-1];
 
-if(last==="repeat"){
+if(last&&last.type==="repeat"){
 stack.pop();
 }else{
+
 addIssue(
-issues,"error","พบ until ไม่ตรงกับ repeat",
-"ตรวจสอบโครงสร้าง repeat-until"
+issues,
+"error",
+"พบ until ไม่ตรงกับ repeat",
+"บรรทัด "+token.line
 );
 }
 }
 }
 
-if(stack.length>0){
+for(const block of stack){
+
 addIssue(
-issues,"warning","โครงสร้างบล็อกอาจไม่ครบ",
-"พบ Block ที่ยังไม่มีคำสั่งปิด: "+stack.join(", ")
+issues,
+"warning",
+"อาจพบ Block ที่ยังไม่ปิด",
+block.type+
+" เริ่มต้นที่บรรทัด "+
+block.line
 );
 }
 }
+
+/* BRACKET INSPECTION */
+
+function scanBrackets(clean,issues){
+
+const stack=[];
+const pairs={
+")":"(",
+"]":"[",
+"}":"{"
+};
+
+for(let i=0;i<clean.length;i++){
+
+const c=clean[i];
+
+const line=clean
+.slice(0,i)
+.split("\n").length;
+
+if("([{".includes(c)){
+
+stack.push({c,line});
+}
+
+if(")]}".includes(c)){
+
+if(
+!stack.length||
+stack[stack.length-1].c!==pairs[c]
+){
+
+addIssue(
+issues,
+"error",
+"วงเล็บไม่ตรงกัน",
+"พบ '"+c+"' บรรทัด "+line
+);
+
+}else{
+
+stack.pop();
+}
+}
+}
+
+stack.forEach(x=>{
+
+addIssue(
+issues,
+"error",
+"วงเล็บเปิดค้าง",
+"พบ '"+x.c+"' บรรทัด "+x.line
+);
+});
+}
+
+/* API INSPECTION */
+
+function scanAPI(clean,issues){
+
+let found=0;
+
+const detected=[];
+
+API_LIST.forEach(api=>{
+
+const regex=new RegExp(
+"\\b"+api+"\\b"
+);
+
+if(regex.test(clean)){
+found++;
+detected.push(api);
+}
+
+});
+
+if(!/\bCreateWindow\b/.test(clean)){
+
+addIssue(
+issues,
+"error",
+"ไม่พบ CreateWindow",
+"ไม่พบ API สร้างหน้าต่างหลัก"
+);
+}
+
+if(!/\bCreateTab\b/.test(clean)){
+
+addIssue(
+issues,
+"warning",
+"ไม่พบ CreateTab",
+"ตรวจสอบ API สร้างแท็บ"
+);
+}
+
+if(!/\bAddButton\b/.test(clean)){
+
+addIssue(
+issues,
+"warning",
+"ไม่พบ AddButton",
+"ไม่พบ API ปุ่ม"
+);
+}
+
+if(!/\bAddToggle\b/.test(clean)){
+
+addIssue(
+issues,
+"warning",
+"ไม่พบ AddToggle",
+"ไม่พบ API Toggle"
+);
+}
+
+if(!/\bDestroy\b/.test(clean)){
+
+addIssue(
+issues,
+"warning",
+"ไม่พบ Destroy",
+"ควรมีระบบ Cleanup UI"
+);
+}
+
+return{
+found,
+detected
+};
+}
+
+/* MAIN SCAN */
 
 function scan(){
 
@@ -376,131 +786,91 @@ return;
 }
 
 const issues=[];
+
 const clean=stripCode(code);
 
-// ตรวจวงเล็บ
-const stack=[];
-const pairs={")":"(","]":"[","}":"{"};
+scanBrackets(clean,issues);
 
-for(let i=0;i<clean.length;i++){
-const c=clean[i];
+const apiResult=scanAPI(clean,issues);
 
-if("([{".includes(c)){
-stack.push({
-c,
-line:clean.slice(0,i).split("\n").length
-});
-}
-
-if(")]}".includes(c)){
-if(!stack.length||stack[stack.length-1].c!==pairs[c]){
-addIssue(
-issues,"error","วงเล็บไม่ตรงกัน",
-"พบ '"+c+"' บรรทัด "+
-clean.slice(0,i).split("\n").length
-);
-}else{
-stack.pop();
-}
-}
-}
-
-stack.forEach(x=>{
-addIssue(
-issues,"error","วงเล็บเปิดค้าง",
-"พบ '"+x.c+"' บรรทัด "+x.line
-);
-});
-
-// ตรวจ API
-let found=0;
-
-API_LIST.forEach(api=>{
-if(new RegExp("\\b"+api+"\\b").test(clean)){
-found++;
-}
-});
-
-if(!/\bCreateWindow\b/.test(clean)){
-addIssue(
-issues,"error","ไม่พบ CreateWindow",
-"ไม่พบ API สร้างหน้าต่างหลัก"
-);
-}
-
-if(!/\bCreateTab\b/.test(clean)){
-addIssue(
-issues,"warning","ไม่พบ CreateTab",
-"ตรวจสอบ API สร้างแท็บ"
-);
-}
-
-if(!/\bAddButton\b/.test(clean)){
-addIssue(
-issues,"warning","ไม่พบ AddButton",
-"ไม่พบ API ปุ่ม"
-);
-}
-
-if(!/\bAddToggle\b/.test(clean)){
-addIssue(
-issues,"warning","ไม่พบ AddToggle",
-"ไม่พบ API Toggle"
-);
-}
-
-if(!/\bDestroy\b/.test(clean)){
-addIssue(
-issues,"warning","ไม่พบ Destroy",
-"ควรมีระบบ Cleanup UI"
-);
-}
-
-// ตรวจ Block ด้วยระบบใหม่
 scanBlocks(clean,issues);
 
-// ตรวจคำสั่งที่ควรตรวจสอบเพิ่มเติม
 if(/\bloadstring\s*\(/.test(clean)){
+
 addIssue(
-issues,"warning","พบ loadstring",
+issues,
+"warning",
+"พบ loadstring",
 "ตรวจสอบความจำเป็นและความปลอดภัย"
 );
 }
 
 if(/\bHttpGet\s*\(/.test(clean)){
+
 addIssue(
-issues,"warning","พบ HttpGet",
+issues,
+"warning",
+"พบ HttpGet",
 "ตรวจสอบแหล่งที่มาของโค้ด"
 );
 }
 
 if(!issues.length){
+
 addIssue(
-issues,"ok","ไม่พบปัญหาเบื้องต้น",
-"ผ่านการตรวจโครงสร้างพื้นฐาน"
+issues,
+"ok",
+"ไม่พบปัญหาเบื้องต้น",
+"ผ่านการตรวจสอบแบบ Static Inspection เบื้องต้น"
 );
 }
 
-const errors=issues.filter(x=>x.type==="error").length;
-const warnings=issues.filter(x=>x.type==="warning").length;
+const errors=issues.filter(
+x=>x.type==="error"
+).length;
 
-const status=errors?"ERROR":warnings?"WARNING":"OK";
+const warnings=issues.filter(
+x=>x.type==="warning"
+).length;
+
+const status=
+errors?"ERROR":
+warnings?"WARNING":"OK";
 
 $("statusCard").textContent=status;
+
 $("statusCard").style.color=
 errors?"var(--red)":
-warnings?"var(--yellow)":"var(--green)";
+warnings?"var(--yellow)":
+"var(--green)";
 
 $("issueCount").textContent=errors+warnings;
-$("apiCount").textContent=found+" / "+API_LIST.length;
+
+$("apiCount").textContent=
+apiResult.found+" / "+API_LIST.length;
+
 $("results").style.display="block";
 
 const badge=$("resultBadge");
+
 badge.textContent=status;
+
 badge.className="pill "+
-(errors?"error":warnings?"warn":"ok");
+(
+errors?"error":
+warnings?"warn":"ok"
+);
+
+$("reportSummary").textContent=
+"Errors: "+errors+
+" · Warnings: "+warnings+
+" · Detected APIs: "+apiResult.found+
+"/"+API_LIST.length+
+" · ตรวจพบ API: "+
+(apiResult.detected.join(", ")||"ไม่มี");
 
 $("report").innerHTML=issues.map(x=>{
+
 const color=
 x.type==="error"?"var(--red)":
 x.type==="warning"?"var(--yellow)":
@@ -512,39 +882,73 @@ return `
 ${escapeHTML(x.title)}
 </b>
 <small>${escapeHTML(x.detail)}</small>
-</div>`;
+</div>
+`;
+
 }).join("");
 
 lastReport=[
-"HelloHub Library Checker v1.1",
+"HelloHub Library Checker v1.2",
 "Status: "+status,
 "Errors: "+errors,
 "Warnings: "+warnings,
-"Detected APIs: "+found+"/12",
+"Detected APIs: "+
+apiResult.found+"/"+API_LIST.length,
+"Detected: "+apiResult.detected.join(", "),
+"Inspection: Heuristic Static Inspection",
+"",
 ...issues.map(x=>
-x.type.toUpperCase()+": "+x.title+" - "+x.detail
+x.type.toUpperCase()+
+": "+x.title+" - "+x.detail
 )
 ].join("\n");
 }
 
+/* CLEAR */
+
 function clearAll(){
+
 $("source").value="";
 $("results").style.display="none";
+
 $("statusCard").textContent="NOT CHECKED";
 $("statusCard").style.color="";
+
 $("issueCount").textContent="0";
 $("apiCount").textContent="0 / 12";
+
 lastReport="";
 }
 
+/* COPY REPORT */
+
 async function copyReport(){
+
 if(!lastReport)return;
 
 try{
+
 await navigator.clipboard.writeText(lastReport);
+
 alert("คัดลอกรายงานแล้ว");
+
 }catch(e){
-alert("คัดลอกไม่ได้ กรุณาใช้เบราว์เซอร์ที่รองรับ");
+
+const temp=document.createElement("textarea");
+
+temp.value=lastReport;
+document.body.appendChild(temp);
+
+temp.select();
+
+try{
+document.execCommand("copy");
+alert("คัดลอกรายงานแล้ว");
+}catch(error){
+alert("คัดลอกไม่ได้");
+}
+
+temp.remove();
 }
 }
 </script>
