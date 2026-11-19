@@ -45,14 +45,14 @@ input,textarea,select{
 input:focus,textarea:focus,select:focus{border-color:var(--purple)}
 textarea{resize:vertical;font:13px/1.7 monospace}
 header{
-  height:66px;display:flex;align-items:center;
+  min-height:66px;display:flex;align-items:center;
   justify-content:space-between;padding:0 22px;
   background:#100d1a;border-bottom:1px solid var(--border);
   position:sticky;top:0;z-index:5;
 }
 .logo{font-size:20px;font-weight:900}
 .logo span{color:var(--pink)}
-.header-right{display:flex;align-items:center;gap:12px}
+.header-right{display:flex;align-items:center;gap:12px;min-width:0}
 .status{font-size:12px;color:var(--green)}
 .layout{display:flex;min-height:calc(100vh - 66px)}
 aside{
@@ -74,6 +74,15 @@ aside{
   background:#30213f;color:var(--pink);
   border-color:#49345d;
 }
+.admin-nav{
+  color:var(--green)!important;
+  border-color:#285744!important;
+  background:#14251f!important;
+}
+.admin-nav.active{
+  background:#1c382c!important;
+  border-color:#39795b!important;
+}
 main{flex:1;min-width:0;padding:28px;max-width:1400px}
 .view{display:none}
 .view.active{display:block}
@@ -81,7 +90,8 @@ h1{font-size:27px;margin:0 0 7px}
 h2{font-size:19px;margin:0 0 14px}
 .sub{color:var(--muted);margin-bottom:24px;font-size:13px}
 .grid{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
   gap:14px;margin-bottom:18px;
 }
 .card,.panel{
@@ -90,20 +100,20 @@ h2{font-size:19px;margin:0 0 14px}
   min-width:0;
 }
 .card small,.muted{color:var(--muted)}
-.card strong{display:block;font-size:24px;margin-top:8px;overflow-wrap:anywhere}
+.card strong{
+  display:block;font-size:24px;margin-top:8px;
+  overflow-wrap:anywhere;
+}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .between{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .field{margin:12px 0}
 .field label{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}
 .actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
-.editor{
-  min-height:340px;font:13px/1.7 monospace;
-  tab-size:2;
-}
+.editor{min-height:340px;font:13px/1.7 monospace;tab-size:2}
 .list-item{
   border-bottom:1px solid var(--border);padding:13px 0;
   display:flex;justify-content:space-between;gap:12px;
-  align-items:center;
+  align-items:center;flex-wrap:wrap;
 }
 .list-item:last-child{border:0}
 .pill{
@@ -124,6 +134,14 @@ h2{font-size:19px;margin:0 0 14px}
 .auth-tabs{display:flex;gap:8px;margin-bottom:18px}
 .auth-tabs button{flex:1}
 .hidden{display:none!important}
+.admin-stat{
+  border-color:#285744;
+  background:#14251f;
+}
+.admin-section{
+  border-left:3px solid var(--green);
+  padding-left:14px;
+}
 #toast{
   position:fixed;bottom:20px;right:20px;z-index:20;
   background:#282039;border:1px solid var(--border);
@@ -144,6 +162,9 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
   .grid{grid-template-columns:1fr}
   h1{font-size:23px}
   header{padding:0 13px}
+  .logo{font-size:16px}
+  .header-right{gap:6px}
+  #headerUser{max-width:100px;overflow:hidden;text-overflow:ellipsis}
 }
 </style>
 </head>
@@ -170,9 +191,15 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
   <button class="nav" data-view="editor">⌘ Script Editor</button>
   <button class="nav" data-view="vault">▤ Script Vault</button>
   <button class="nav" data-view="versions">◷ Version Manager</button>
+
   <div class="nav-title">ACCOUNT</div>
   <button class="nav" data-view="account">◉ Account</button>
   <button class="nav" data-view="settings">⚙ Settings</button>
+
+  <div class="nav-title admin-only hidden">ADMINISTRATION</div>
+  <button class="nav admin-nav hidden" id="adminNav" data-view="admin">
+    🛡 Super Admin Panel
+  </button>
 </aside>
 
 <main>
@@ -244,7 +271,9 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
     </div>
     <div class="muted" id="reportSummary"></div>
     <div class="report" id="report"></div>
-    <div class="actions"><button class="secondary" onclick="copyReport()">Copy Report</button></div>
+    <div class="actions">
+      <button class="secondary" onclick="copyReport()">Copy Report</button>
+    </div>
   </div>
 </section>
 
@@ -340,6 +369,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
     <div class="field"><label>Email</label><input id="profileEmail" disabled></div>
     <div class="field"><label>Username</label><input id="profileUsername" disabled></div>
     <div class="field"><label>User ID</label><input id="profileId" disabled></div>
+    <div class="field"><label>Account Role</label><input id="profileRole" disabled></div>
     <div class="actions">
       <button class="danger" onclick="logout()">Logout</button>
     </div>
@@ -353,7 +383,7 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
   <div class="panel">
     <h2>Application</h2>
     <p class="muted">HelloHub Developer Center</p>
-    <p class="muted">Version: 2.0.0</p>
+    <p class="muted">Version: 2.1.0</p>
     <p class="muted">Runtime: Web + Supabase</p>
   </div>
   <div class="panel">
@@ -363,10 +393,99 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
   </div>
 </section>
 
+<!-- SUPER ADMIN PANEL -->
+<section class="view" id="view-admin">
+  <div class="between">
+    <div>
+      <h1>🛡 Super Admin Panel</h1>
+      <div class="sub">HelloHub Administration Center</div>
+    </div>
+    <span class="pill good">ADMIN ACCESS</span>
+  </div>
+
+  <div class="grid">
+    <div class="card admin-stat">
+      <small>Admin Status</small>
+      <strong class="good" id="adminStatus">Verified</strong>
+    </div>
+    <div class="card admin-stat">
+      <small>Your Role</small>
+      <strong id="adminRole">Super Admin</strong>
+    </div>
+    <div class="card">
+      <small>Your Saved Scripts</small>
+      <strong id="adminScripts">0</strong>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="admin-section">Admin Identity</h2>
+    <div class="field">
+      <label>Admin Email</label>
+      <input id="adminEmail" disabled>
+    </div>
+    <div class="field">
+      <label>Admin User ID</label>
+      <input id="adminUserId" disabled>
+    </div>
+    <div class="field">
+      <label>Authorization</label>
+      <input value="Supabase app_metadata.role" disabled>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="admin-section">Administration Modules</h2>
+
+    <div class="list-item">
+      <div>
+        <b>👥 User Management</b>
+        <div class="muted">จัดการบัญชีและสิทธิ์ผู้ใช้งาน</div>
+      </div>
+      <span class="pill warn">Backend Required</span>
+    </div>
+
+    <div class="list-item">
+      <div>
+        <b>📦 Script Management</b>
+        <div class="muted">ตรวจสอบ Script ในระบบ</div>
+      </div>
+      <span class="pill warn">Backend Required</span>
+    </div>
+
+    <div class="list-item">
+      <div>
+        <b>📢 Announcements</b>
+        <div class="muted">จัดการประกาศข่าวสาร</div>
+      </div>
+      <span class="pill warn">Backend Required</span>
+    </div>
+
+    <div class="list-item">
+      <div>
+        <b>📋 Audit Logs</b>
+        <div class="muted">ตรวจสอบประวัติการดำเนินการ</div>
+      </div>
+      <span class="pill warn">Backend Required</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2 class="admin-section">Security Information</h2>
+    <p class="muted">
+      บัญชีนี้ได้รับสิทธิ์ Admin จาก Supabase app_metadata
+    </p>
+    <p class="muted">
+      การจัดการผู้ใช้และข้อมูลส่วนกลางจะเปิดใช้งาน
+      หลังจากติดตั้ง Edge Functions และกำหนด RLS Policies
+    </p>
+  </div>
+</section>
+
 </main>
 </div>
 
-<footer>HelloHub Developer Center · Luau Tools</footer>
+<footer>HelloHub Developer Center · Luau Tools · v2.1.0</footer>
 <div id="toast"></div>
 
 <script>
@@ -404,29 +523,72 @@ function toast(message){
   toast.timer=setTimeout(()=>el.style.display="none",3500);
 }
 
+function toggleMenu(){
+  $("sidebar").classList.toggle("open");
+}
+
+function isAdmin(){
+  return currentUser?.app_metadata?.role === "admin";
+}
+
+function updateAdminUI(){
+  const admin=isAdmin();
+
+  document.querySelectorAll(".admin-only")
+    .forEach(el=>el.classList.toggle("hidden",!admin));
+
+  $("adminNav").classList.toggle("hidden",!admin);
+
+  if(!admin && $("view-admin").classList.contains("active")){
+    showView("dashboard");
+  }
+}
+
+function renderAdminPanel(){
+  if(!isAdmin()){
+    toast("Admin authorization required");
+    showView("dashboard");
+    return;
+  }
+
+  $("adminStatus").textContent="Verified";
+  $("adminRole").textContent="Super Admin";
+  $("adminEmail").value=currentUser.email||"";
+  $("adminUserId").value=currentUser.id;
+  $("adminScripts").textContent=String(scripts.length);
+}
+
 function showView(name){
-  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-  document.querySelectorAll(".nav").forEach(v=>v.classList.remove("active"));
+  if(name==="admin" && !isAdmin()){
+    toast("คุณไม่มีสิทธิ์เข้าถึง Admin Panel");
+    return;
+  }
+
+  document.querySelectorAll(".view")
+    .forEach(v=>v.classList.remove("active"));
+
+  document.querySelectorAll(".nav")
+    .forEach(v=>v.classList.remove("active"));
 
   const view=$("view-"+name);
   if(view)view.classList.add("active");
 
-  const nav=document.querySelector('.nav[data-view="'+name+'"]');
+  const nav=document.querySelector(
+    '.nav[data-view="'+name+'"]'
+  );
+
   if(nav)nav.classList.add("active");
 
   $("sidebar").classList.remove("open");
 
   if(name==="vault")loadVault();
   if(name==="versions")updateVersionSelect();
+  if(name==="admin")renderAdminPanel();
 }
 
 document.querySelectorAll(".nav").forEach(button=>{
   button.addEventListener("click",()=>showView(button.dataset.view));
 });
-
-function toggleMenu(){
-  $("sidebar").classList.toggle("open");
-}
 
 /* =====================================
    AUTHENTICATION
@@ -506,8 +668,12 @@ async function logout(){
 }
 
 async function updateAuthUI(){
-  const {data}=await supabaseClient.auth.getSession();
+  const {data,error}=await supabaseClient.auth.getSession();
+  if(error)throw error;
+
   currentUser=data.session?.user||null;
+
+  updateAdminUI();
 
   $("connectionStatus").textContent="● Supabase Connected";
   $("connectionStatus").style.color="var(--green)";
@@ -523,6 +689,8 @@ async function updateAuthUI(){
     $("profileUsername").value=
       currentUser.user_metadata?.username||"";
     $("profileId").value=currentUser.id;
+    $("profileRole").value=isAdmin()?"Super Admin":"User";
+
     await loadVault();
   }else{
     scripts=[];
@@ -530,7 +698,10 @@ async function updateAuthUI(){
     $("vaultList").textContent="กรุณาเข้าสู่ระบบก่อนใช้งาน Vault";
     $("recentScripts").textContent="Sign in to view your scripts.";
     $("versionList").textContent="กรุณาเข้าสู่ระบบ";
-    $("versionScript").innerHTML='<option value="">-- Select Script --</option>';
+    $("versionScript").innerHTML=
+      '<option value="">-- Select Script --</option>';
+    $("profileRole").value="";
+    updateAdminUI();
   }
 }
 
@@ -798,12 +969,13 @@ async function addVersion(id){
   const script=scripts.find(s=>s.id===id);
   if(!script)return;
 
-  const source=$("editorCode").value;
-  const title=$("editorTitle").value.trim();
+  let content;
 
-  let content=source;
-
-  if(!content.trim()){
+  // หากกำลังแก้ไข Script ตัวเดียวกัน ให้ใช้ Source ใน Editor
+  if($("editorTitle").value.trim()===script.title &&
+     $("editorCode").value.trim()){
+    content=$("editorCode").value;
+  }else{
     try{
       content=await readStorageFile(script.storage_path);
     }catch(error){
@@ -816,7 +988,7 @@ async function addVersion(id){
   if(changelog===null)return;
 
   try{
-    const path=makeStoragePath(currentUser.id,id,title||script.title);
+    const path=makeStoragePath(currentUser.id,id,script.title);
     await uploadSource(path,content);
     await insertVersion(id,path,changelog);
 
@@ -927,7 +1099,7 @@ function downloadEditor(){
   a.href=url;
   a.download=name+".luau";
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
 function sendEditorToChecker(){
@@ -937,7 +1109,7 @@ function sendEditorToChecker(){
 }
 
 /* =====================================
-   LUАU LIBRARY CHECKER
+   LUAU LIBRARY CHECKER
 ===================================== */
 
 const API_LIST=[
