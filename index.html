@@ -4,228 +4,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HelloHub | Library Checker</title>
+<title>HelloHub | Developer Center</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 :root{
---bg:#090812;
---panel:#141220;
---panel2:#1c192b;
---border:#302943;
---text:#f4efff;
---muted:#a49ab8;
---pink:#ff73c3;
---purple:#a069ff;
---green:#55dfa0;
---red:#ff647d;
---yellow:#ffd36b;
+  --bg:#090812;
+  --panel:#141220;
+  --panel2:#1c192b;
+  --border:#302943;
+  --text:#f4efff;
+  --muted:#a49ab8;
+  --pink:#ff73c3;
+  --purple:#a069ff;
+  --green:#55dfa0;
+  --red:#ff647d;
+  --yellow:#ffd36b;
 }
-
 *{box-sizing:border-box}
-
 body{
-margin:0;
-background:var(--bg);
-color:var(--text);
-font-family:Inter,system-ui,sans-serif;
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,system-ui,sans-serif;
 }
-
+button,input,textarea,select{font:inherit}
+button{
+  border:0;border-radius:9px;padding:11px 16px;
+  background:linear-gradient(110deg,var(--pink),var(--purple));
+  color:white;font-weight:700;cursor:pointer;
+}
+button.secondary{
+  background:var(--panel2);border:1px solid var(--border);
+}
+button.danger{background:#451e2a;color:#ff9aaa}
+button:disabled{opacity:.5;cursor:not-allowed}
+input,textarea,select{
+  width:100%;background:#0b0913;color:var(--text);
+  border:1px solid var(--border);border-radius:9px;
+  padding:12px;outline:none;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--purple)}
+textarea{resize:vertical;font:13px/1.7 monospace}
 header{
-min-height:70px;
-border-bottom:1px solid var(--border);
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:14px 5%;
-background:#100d1a;
+  height:66px;display:flex;align-items:center;
+  justify-content:space-between;padding:0 22px;
+  background:#100d1a;border-bottom:1px solid var(--border);
+  position:sticky;top:0;z-index:5;
 }
-
-.logo{
-font-weight:900;
-font-size:21px;
-}
-
+.logo{font-size:20px;font-weight:900}
 .logo span{color:var(--pink)}
-
-.status{
-color:var(--green);
-font-size:13px;
-}
-
-.layout{
-display:flex;
-min-height:calc(100vh - 70px);
-}
-
+.header-right{display:flex;align-items:center;gap:12px}
+.status{font-size:12px;color:var(--green)}
+.layout{display:flex;min-height:calc(100vh - 66px)}
 aside{
-width:220px;
-padding:25px 15px;
-border-right:1px solid var(--border);
-flex-shrink:0;
+  width:230px;flex-shrink:0;padding:22px 14px;
+  border-right:1px solid var(--border);
+  background:#100d1a;
 }
-
+.nav-title{
+  color:var(--muted);font-size:10px;font-weight:800;
+  letter-spacing:1.5px;padding:15px 12px 8px;
+}
 .nav{
-padding:13px;
-border-radius:10px;
-color:var(--muted);
-margin-bottom:7px;
-font-size:14px;
+  width:100%;display:flex;align-items:center;gap:10px;
+  background:transparent;color:var(--muted);
+  text-align:left;margin:3px 0;padding:12px;
+  border:1px solid transparent;
 }
-
 .nav.active{
-background:#30213f;
-color:var(--pink);
+  background:#30213f;color:var(--pink);
+  border-color:#49345d;
 }
-
-main{
-flex:1;
-padding:35px;
-max-width:1200px;
-min-width:0;
+main{flex:1;min-width:0;padding:28px;max-width:1400px}
+.view{display:none}
+.view.active{display:block}
+h1{font-size:27px;margin:0 0 7px}
+h2{font-size:19px;margin:0 0 14px}
+.sub{color:var(--muted);margin-bottom:24px;font-size:13px}
+.grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:14px;margin-bottom:18px;
 }
-
-h1{
-font-size:29px;
-margin:0 0 8px;
+.card,.panel{
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:14px;padding:19px;margin-bottom:16px;
+  min-width:0;
 }
-
-.sub{
-color:var(--muted);
-margin-bottom:25px;
+.card small,.muted{color:var(--muted)}
+.card strong{display:block;font-size:24px;margin-top:8px;overflow-wrap:anywhere}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.field{margin:12px 0}
+.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:13px}
+.editor{
+  min-height:340px;font:13px/1.7 monospace;
+  tab-size:2;
 }
-
-.cards{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:15px;
-margin-bottom:22px;
+.list-item{
+  border-bottom:1px solid var(--border);padding:13px 0;
+  display:flex;justify-content:space-between;gap:12px;
+  align-items:center;
 }
-
-.card,.editor,.results{
-background:var(--panel);
-border:1px solid var(--border);
-border-radius:15px;
-padding:20px;
-}
-
-.card small{color:var(--muted)}
-
-.card strong{
-display:block;
-font-size:23px;
-margin-top:9px;
-overflow-wrap:anywhere;
-}
-
-.section-title{
-font-weight:700;
-margin-bottom:13px;
-}
-
-textarea{
-width:100%;
-height:300px;
-resize:vertical;
-background:#0b0913;
-color:#e9dfff;
-border:1px solid var(--border);
-border-radius:10px;
-padding:15px;
-font:13px/1.7 monospace;
-outline:none;
-}
-
-textarea:focus{border-color:var(--purple)}
-
-.actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:14px;
-}
-
-button,.upload{
-border:0;
-border-radius:9px;
-padding:12px 18px;
-background:linear-gradient(110deg,var(--pink),var(--purple));
-color:white;
-font-weight:700;
-cursor:pointer;
-font-size:13px;
-}
-
-button.secondary,.upload{
-background:var(--panel2);
-border:1px solid var(--border);
-}
-
-button:disabled{
-opacity:.5;
-cursor:not-allowed;
-}
-
-input[type=file]{display:none}
-
-.results{
-margin-top:20px;
-display:none;
-}
-
-.result-head{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:12px;
-margin-bottom:15px;
-}
-
+.list-item:last-child{border:0}
 .pill{
-padding:7px 12px;
-border-radius:20px;
-font-size:12px;
-font-weight:800;
+  border-radius:20px;padding:5px 10px;font-size:11px;
+  background:#30213f;color:var(--pink);
 }
-
-.ok{background:#153b2d;color:var(--green)}
-.warn{background:#44351b;color:var(--yellow)}
-.error{background:#451e2a;color:var(--red)}
-
+.good{color:var(--green)}
+.bad{color:var(--red)}
+.warn{color:var(--yellow)}
+.report{margin-top:15px}
 .issue{
-padding:13px;
-border-bottom:1px solid var(--border);
-font-size:13px;
-line-height:1.6;
-overflow-wrap:anywhere;
+  padding:12px;border-bottom:1px solid var(--border);
+  font-size:13px;line-height:1.6;
 }
-
-.issue:last-child{border:0}
-
-.issue b{
-display:block;
-margin-bottom:3px;
+.issue b{display:block}
+.empty{color:var(--muted);padding:20px;text-align:center}
+.auth-box{max-width:480px;margin:30px auto}
+.auth-tabs{display:flex;gap:8px;margin-bottom:18px}
+.auth-tabs button{flex:1}
+.hidden{display:none!important}
+#toast{
+  position:fixed;bottom:20px;right:20px;z-index:20;
+  background:#282039;border:1px solid var(--border);
+  padding:13px 17px;border-radius:10px;
+  display:none;max-width:90vw;font-size:13px;
 }
-
-.issue small{color:var(--muted)}
-
-.report-summary{
-color:var(--muted);
-font-size:13px;
-margin-bottom:12px;
-}
-
-footer{
-padding:25px;
-color:var(--muted);
-text-align:center;
-font-size:12px;
-}
-
-@media(max-width:750px){
-aside{display:none}
-main{padding:20px 14px}
-.cards{grid-template-columns:1fr}
-h1{font-size:24px}
+footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
+#mobileMenu{display:none}
+@media(max-width:800px){
+  aside{
+    display:none;position:fixed;top:66px;bottom:0;left:0;
+    z-index:10;width:245px;overflow:auto;
+    box-shadow:10px 0 30px #0008;
+  }
+  aside.open{display:block}
+  #mobileMenu{display:inline-block}
+  main{padding:19px 13px}
+  .grid{grid-template-columns:1fr}
+  h1{font-size:23px}
+  header{padding:0 13px}
 }
 </style>
 </head>
@@ -233,724 +151,1107 @@ h1{font-size:24px}
 <body>
 
 <header>
-<div class="logo">Hello<span>Hub</span> Library</div>
-<div class="status">● LOCAL CHECKER</div>
+  <div class="row">
+    <button id="mobileMenu" class="secondary" onclick="toggleMenu()">☰</button>
+    <div class="logo">Hello<span>Hub</span> Developer Center</div>
+  </div>
+  <div class="header-right">
+    <span class="status" id="connectionStatus">● Connecting</span>
+    <span id="headerUser" class="muted"></span>
+  </div>
 </header>
 
 <div class="layout">
 
-<aside>
-<div class="nav active">◈ Library Checker</div>
-<div class="nav">▤ API Inspection</div>
-<div class="nav">◉ Syntax Report</div>
-<div class="nav">⚙ Settings</div>
+<aside id="sidebar">
+  <div class="nav-title">WORKSPACE</div>
+  <button class="nav active" data-view="dashboard">◈ Dashboard</button>
+  <button class="nav" data-view="checker">⌕ Library Checker</button>
+  <button class="nav" data-view="editor">⌘ Script Editor</button>
+  <button class="nav" data-view="vault">▤ Script Vault</button>
+  <button class="nav" data-view="versions">◷ Version Manager</button>
+  <div class="nav-title">ACCOUNT</div>
+  <button class="nav" data-view="account">◉ Account</button>
+  <button class="nav" data-view="settings">⚙ Settings</button>
 </aside>
 
 <main>
 
-<h1>Library Checker</h1>
+<!-- DASHBOARD -->
+<section class="view active" id="view-dashboard">
+  <h1>Dashboard</h1>
+  <div class="sub">Welcome to HelloHub Developer Center.</div>
 
-<div class="sub">
-ตรวจสอบโครงสร้างและ API ของ HelloHub UI Library
-</div>
+  <div class="grid">
+    <div class="card">
+      <small>Account Status</small>
+      <strong id="dashAccount">Guest</strong>
+    </div>
+    <div class="card">
+      <small>Saved Scripts</small>
+      <strong id="dashScripts">0</strong>
+    </div>
+    <div class="card">
+      <small>Latest Checker</small>
+      <strong id="dashChecker">Ready</strong>
+    </div>
+  </div>
 
-<div class="cards">
+  <div class="panel">
+    <h2>Quick Actions</h2>
+    <div class="actions">
+      <button onclick="showView('editor')">Open Editor</button>
+      <button class="secondary" onclick="showView('checker')">Check Library</button>
+      <button class="secondary" onclick="showView('vault')">Open Vault</button>
+      <button class="secondary" onclick="showView('account')">Account</button>
+    </div>
+  </div>
 
-<div class="card">
-<small>Library Status</small>
-<strong id="statusCard">NOT CHECKED</strong>
-</div>
+  <div class="panel">
+    <h2>Recent Scripts</h2>
+    <div id="recentScripts" class="empty">Sign in to view your scripts.</div>
+  </div>
+</section>
 
-<div class="card">
-<small>Issues Found</small>
-<strong id="issueCount">0</strong>
-</div>
+<!-- LIBRARY CHECKER -->
+<section class="view" id="view-checker">
+  <h1>Library Checker</h1>
+  <div class="sub">Luau Static Inspection · ตรวจสอบโครงสร้างและ API</div>
 
-<div class="card">
-<small>Detected APIs</small>
-<strong id="apiCount">0 / 12</strong>
-</div>
+  <div class="grid">
+    <div class="card"><small>Library Status</small><strong id="statusCard">NOT CHECKED</strong></div>
+    <div class="card"><small>Issues Found</small><strong id="issueCount">0</strong></div>
+    <div class="card"><small>Detected APIs</small><strong id="apiCount">0 / 12</strong></div>
+  </div>
 
-</div>
+  <div class="panel">
+    <h2>Source Code</h2>
+    <textarea id="source" class="editor" placeholder="วางโค้ด HelloHub Luau ที่นี่..."></textarea>
+    <div class="actions">
+      <button onclick="scan()">ตรวจสอบ Library</button>
+      <label class="secondary" style="padding:11px 15px;border-radius:9px;cursor:pointer">
+        เลือกไฟล์ .lua
+        <input type="file" id="file" accept=".lua,.luau,.txt" hidden>
+      </label>
+      <button class="secondary" onclick="clearChecker()">Clear</button>
+    </div>
+  </div>
 
-<div class="editor">
+  <div class="panel hidden" id="checkerResults">
+    <div class="between">
+      <h2>Inspection Report</h2>
+      <span class="pill" id="resultBadge">WAITING</span>
+    </div>
+    <div class="muted" id="reportSummary"></div>
+    <div class="report" id="report"></div>
+    <div class="actions"><button class="secondary" onclick="copyReport()">Copy Report</button></div>
+  </div>
+</section>
 
-<div class="section-title">Source Code</div>
+<!-- EDITOR -->
+<section class="view" id="view-editor">
+  <h1>Script Editor</h1>
+  <div class="sub">เขียนและแก้ไข Luau Script สำหรับ Roblox Studio</div>
 
-<textarea
-id="source"
-spellcheck="false"
-placeholder="วางโค้ด HelloHub Luau ที่นี่..."
-></textarea>
+  <div class="panel">
+    <div class="field">
+      <label>Script Name</label>
+      <input id="editorTitle" placeholder="My HelloHub Script">
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <input id="editorDescription" placeholder="รายละเอียดของ Script">
+    </div>
+    <div class="field">
+      <label>Luau Source</label>
+      <textarea id="editorCode" class="editor" style="height:390px"
+        placeholder="-- เขียน Luau ของคุณที่นี่"></textarea>
+    </div>
+    <div class="actions">
+      <button onclick="saveNewScript()">Save to Vault</button>
+      <button class="secondary" onclick="downloadEditor()">Download .luau</button>
+      <button class="secondary" onclick="sendEditorToChecker()">Inspect Code</button>
+      <button class="secondary" onclick="newEditor()">New</button>
+    </div>
+    <p class="muted" style="font-size:11px">
+      บันทึกลง Private Storage ของบัญชีที่เข้าสู่ระบบ
+    </p>
+  </div>
+</section>
 
-<div class="actions">
+<!-- VAULT -->
+<section class="view" id="view-vault">
+  <div class="between">
+    <div>
+      <h1>Script Vault</h1>
+      <div class="sub">คลัง Script ส่วนตัวของคุณ</div>
+    </div>
+    <button onclick="loadVault()">↻ Refresh</button>
+  </div>
+  <div class="panel">
+    <div id="vaultList" class="empty">กรุณาเข้าสู่ระบบก่อนใช้งาน Vault</div>
+  </div>
+</section>
 
-<button onclick="scan()">ตรวจสอบ Library</button>
+<!-- VERSIONS -->
+<section class="view" id="view-versions">
+  <h1>Version Manager</h1>
+  <div class="sub">ประวัติการบันทึกเวอร์ชันของ Script</div>
+  <div class="panel">
+    <div class="field">
+      <label>เลือก Script</label>
+      <select id="versionScript" onchange="loadVersions()">
+        <option value="">-- Select Script --</option>
+      </select>
+    </div>
+    <div id="versionList" class="empty">เลือก Script เพื่อดูประวัติเวอร์ชัน</div>
+  </div>
+</section>
 
-<label class="upload">
-เลือกไฟล์ .lua
-<input type="file" id="file" accept=".lua,.luau,.txt">
-</label>
+<!-- ACCOUNT -->
+<section class="view" id="view-account">
+  <h1>Account</h1>
+  <div class="sub">จัดการบัญชี HelloHub ของคุณ</div>
 
-<button class="secondary" onclick="clearAll()">Clear</button>
+  <div class="panel auth-box" id="authPanel">
+    <div class="auth-tabs">
+      <button id="loginTab" onclick="setAuthMode('login')">Login</button>
+      <button id="signupTab" class="secondary" onclick="setAuthMode('signup')">Register</button>
+    </div>
 
-</div>
-</div>
+    <div id="usernameField" class="field hidden">
+      <label>Username</label>
+      <input id="authUsername" maxlength="30" placeholder="Your username">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input id="authPassword" type="password" autocomplete="current-password" placeholder="Password">
+    </div>
+    <button id="authSubmit" style="width:100%" onclick="submitAuth()">Login</button>
+    <p class="muted" id="authMessage" style="font-size:12px"></p>
+  </div>
 
-<div class="results" id="results">
+  <div class="panel hidden" id="profilePanel">
+    <h2>Profile</h2>
+    <div class="field"><label>Email</label><input id="profileEmail" disabled></div>
+    <div class="field"><label>Username</label><input id="profileUsername" disabled></div>
+    <div class="field"><label>User ID</label><input id="profileId" disabled></div>
+    <div class="actions">
+      <button class="danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</section>
 
-<div class="result-head">
-<div class="section-title">Inspection Report</div>
-<span class="pill" id="resultBadge">WAITING</span>
-</div>
-
-<div class="report-summary" id="reportSummary"></div>
-
-<div id="report"></div>
-
-<div class="actions">
-<button class="secondary" onclick="copyReport()">
-Copy Report
-</button>
-</div>
-
-</div>
+<!-- SETTINGS -->
+<section class="view" id="view-settings">
+  <h1>Settings</h1>
+  <div class="sub">การตั้งค่าระบบ Developer Center</div>
+  <div class="panel">
+    <h2>Application</h2>
+    <p class="muted">HelloHub Developer Center</p>
+    <p class="muted">Version: 2.0.0</p>
+    <p class="muted">Runtime: Web + Supabase</p>
+  </div>
+  <div class="panel">
+    <h2>Security</h2>
+    <p class="muted">ใช้ Supabase Publishable Key บน Frontend เท่านั้น</p>
+    <p class="muted">ข้อมูล Vault ถูกจำกัดด้วย Row Level Security และ Private Storage</p>
+  </div>
+</section>
 
 </main>
 </div>
 
-<footer>
-HelloHub Library Checker v1.2 · Luau Static Inspection
-</footer>
+<footer>HelloHub Developer Center · Luau Tools</footer>
+<div id="toast"></div>
 
 <script>
+"use strict";
+
+/* =====================================
+   SUPABASE CONFIGURATION
+===================================== */
+
+const SUPABASE_URL = "https://engwoqgapjmhbtrnzvjk.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_oVfYZ6JnZ-CDX13Fn0Fdcg_YKG9cBYi";
+const BUCKET = "hello-vault";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
+
 const $ = id => document.getElementById(id);
 
+let currentUser = null;
+let scripts = [];
 let lastReport = "";
+let authMode = "login";
 
-const API_LIST = [
-"CreateWindow",
-"CreateTab",
-"AddSection",
-"AddButton",
-"AddToggle",
-"AddSlider",
-"AddDropdown",
-"AddLabel",
-"Notify",
-"SetTheme",
-"Reload",
-"Destroy"
+/* =====================================
+   GENERAL UI
+===================================== */
+
+function toast(message){
+  const el=$("toast");
+  el.textContent=message;
+  el.style.display="block";
+  clearTimeout(toast.timer);
+  toast.timer=setTimeout(()=>el.style.display="none",3500);
+}
+
+function showView(name){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".nav").forEach(v=>v.classList.remove("active"));
+
+  const view=$("view-"+name);
+  if(view)view.classList.add("active");
+
+  const nav=document.querySelector('.nav[data-view="'+name+'"]');
+  if(nav)nav.classList.add("active");
+
+  $("sidebar").classList.remove("open");
+
+  if(name==="vault")loadVault();
+  if(name==="versions")updateVersionSelect();
+}
+
+document.querySelectorAll(".nav").forEach(button=>{
+  button.addEventListener("click",()=>showView(button.dataset.view));
+});
+
+function toggleMenu(){
+  $("sidebar").classList.toggle("open");
+}
+
+/* =====================================
+   AUTHENTICATION
+===================================== */
+
+function setAuthMode(mode){
+  authMode=mode;
+  const signup=mode==="signup";
+
+  $("usernameField").classList.toggle("hidden",!signup);
+  $("authSubmit").textContent=signup?"Create Account":"Login";
+  $("loginTab").className=signup?"secondary":"";
+  $("signupTab").className=signup?"":"secondary";
+  $("authMessage").textContent="";
+}
+
+async function submitAuth(){
+  const email=$("authEmail").value.trim();
+  const password=$("authPassword").value;
+  const username=$("authUsername").value.trim();
+
+  if(!email||!password){
+    toast("กรุณากรอก Email และ Password");
+    return;
+  }
+
+  if(password.length<6){
+    toast("Password ต้องมีอย่างน้อย 6 ตัวอักษร");
+    return;
+  }
+
+  $("authSubmit").disabled=true;
+
+  try{
+    if(authMode==="signup"){
+      if(!username){
+        toast("กรุณากรอก Username");
+        return;
+      }
+
+      const {data,error}=await supabaseClient.auth.signUp({
+        email,
+        password,
+        options:{
+          data:{username},
+          emailRedirectTo:location.origin+location.pathname
+        }
+      });
+
+      if(error)throw error;
+
+      if(data.session){
+        toast("สมัครสมาชิกสำเร็จ");
+      }else{
+        $("authMessage").textContent=
+          "สมัครสมาชิกแล้ว กรุณาตรวจสอบอีเมลเพื่อยืนยันบัญชี";
+        toast("กรุณายืนยันอีเมล");
+      }
+    }else{
+      const {error}=await supabaseClient.auth.signInWithPassword({
+        email,password
+      });
+      if(error)throw error;
+      toast("เข้าสู่ระบบสำเร็จ");
+    }
+  }catch(error){
+    toast(error.message||"Authentication failed");
+  }finally{
+    $("authSubmit").disabled=false;
+  }
+}
+
+async function logout(){
+  const {error}=await supabaseClient.auth.signOut();
+  if(error){toast(error.message);return;}
+  toast("ออกจากระบบแล้ว");
+}
+
+async function updateAuthUI(){
+  const {data}=await supabaseClient.auth.getSession();
+  currentUser=data.session?.user||null;
+
+  $("connectionStatus").textContent="● Supabase Connected";
+  $("connectionStatus").style.color="var(--green)";
+
+  $("authPanel").classList.toggle("hidden",!!currentUser);
+  $("profilePanel").classList.toggle("hidden",!currentUser);
+
+  $("headerUser").textContent=currentUser?.email||"Guest";
+  $("dashAccount").textContent=currentUser?"Signed In":"Guest";
+
+  if(currentUser){
+    $("profileEmail").value=currentUser.email||"";
+    $("profileUsername").value=
+      currentUser.user_metadata?.username||"";
+    $("profileId").value=currentUser.id;
+    await loadVault();
+  }else{
+    scripts=[];
+    $("dashScripts").textContent="0";
+    $("vaultList").textContent="กรุณาเข้าสู่ระบบก่อนใช้งาน Vault";
+    $("recentScripts").textContent="Sign in to view your scripts.";
+    $("versionList").textContent="กรุณาเข้าสู่ระบบ";
+    $("versionScript").innerHTML='<option value="">-- Select Script --</option>';
+  }
+}
+
+supabaseClient.auth.onAuthStateChange((_event,session)=>{
+  currentUser=session?.user||null;
+  setTimeout(()=>updateAuthUI(),0);
+});
+
+/* =====================================
+   PRIVATE STORAGE HELPERS
+===================================== */
+
+function safeFileName(name){
+  return String(name||"script")
+    .replace(/[^a-zA-Z0-9_-]/g,"_")
+    .slice(0,60)||"script";
+}
+
+function makeStoragePath(userId,scriptId,label){
+  return userId+"/"+scriptId+"/"+Date.now()+"_"+safeFileName(label)+".luau";
+}
+
+async function uploadSource(path,source){
+  const blob=new Blob([source],{
+    type:"text/plain;charset=utf-8"
+  });
+
+  const {error}=await supabaseClient.storage
+    .from(BUCKET)
+    .upload(path,blob,{
+      contentType:"text/plain",
+      upsert:false
+    });
+
+  if(error)throw error;
+}
+
+async function readStorageFile(path){
+  const {data,error}=await supabaseClient.storage
+    .from(BUCKET)
+    .download(path);
+
+  if(error)throw error;
+  return await data.text();
+}
+
+/* =====================================
+   SCRIPT VAULT
+===================================== */
+
+async function loadVault(){
+  if(!currentUser)return;
+
+  $("vaultList").textContent="กำลังโหลด...";
+  $("recentScripts").textContent="กำลังโหลด...";
+
+  try{
+    const {data,error}=await supabaseClient
+      .from("vault_scripts")
+      .select("*")
+      .order("updated_at",{ascending:false});
+
+    if(error)throw error;
+
+    scripts=data||[];
+    renderVault();
+    updateVersionSelect();
+  }catch(error){
+    $("vaultList").textContent="โหลด Vault ไม่สำเร็จ: "+error.message;
+    $("recentScripts").textContent="โหลดไม่สำเร็จ";
+  }
+}
+
+function renderVault(){
+  $("dashScripts").textContent=String(scripts.length);
+
+  if(!scripts.length){
+    $("vaultList").innerHTML='<div class="empty">ยังไม่มี Script ใน Vault</div>';
+    $("recentScripts").innerHTML='<div class="empty">ยังไม่มี Script</div>';
+    return;
+  }
+
+  $("vaultList").innerHTML=scripts.map(script=>`
+    <div class="list-item">
+      <div style="min-width:0">
+        <b>${escapeHTML(script.title)}</b>
+        <div class="muted" style="font-size:11px">
+          ${escapeHTML(script.description||"No description")}
+        </div>
+      </div>
+      <div class="row">
+        <button class="secondary" onclick="openScript('${script.id}')">Open</button>
+        <button class="secondary" onclick="addVersion('${script.id}')">New Version</button>
+        <button class="danger" onclick="deleteScript('${script.id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+
+  $("recentScripts").innerHTML=scripts.slice(0,5).map(script=>`
+    <div class="list-item">
+      <b>${escapeHTML(script.title)}</b>
+      <button class="secondary" onclick="openScript('${script.id}')">Open</button>
+    </div>
+  `).join("");
+}
+
+async function saveNewScript(){
+  if(!currentUser){
+    toast("กรุณา Login ก่อนบันทึก");
+    showView("account");
+    return;
+  }
+
+  const title=$("editorTitle").value.trim();
+  const description=$("editorDescription").value.trim();
+  const source=$("editorCode").value;
+
+  if(!title||!source.trim()){
+    toast("กรุณากรอกชื่อและ Source Code");
+    return;
+  }
+
+  try{
+    const {data:script,error}=await supabaseClient
+      .from("vault_scripts")
+      .insert({
+        owner_id:currentUser.id,
+        title,
+        description,
+        language:"luau",
+        storage_path:"pending"
+      })
+      .select()
+      .single();
+
+    if(error)throw error;
+
+    const path=makeStoragePath(currentUser.id,script.id,title);
+
+    try{
+      await uploadSource(path,source);
+
+      const {error:updateError}=await supabaseClient
+        .from("vault_scripts")
+        .update({
+          storage_path:path,
+          updated_at:new Date().toISOString()
+        })
+        .eq("id",script.id);
+
+      if(updateError)throw updateError;
+
+      await insertVersion(script.id,path,"Initial version");
+    }catch(uploadError){
+      await supabaseClient.from("vault_scripts")
+        .delete().eq("id",script.id);
+      throw uploadError;
+    }
+
+    toast("บันทึก Script สำเร็จ");
+    await loadVault();
+    showView("vault");
+  }catch(error){
+    toast("บันทึกไม่สำเร็จ: "+error.message);
+  }
+}
+
+async function openScript(id){
+  const script=scripts.find(s=>s.id===id);
+  if(!script)return;
+
+  try{
+    const source=await readStorageFile(script.storage_path);
+    $("editorTitle").value=script.title;
+    $("editorDescription").value=script.description||"";
+    $("editorCode").value=source;
+    showView("editor");
+    toast("เปิด Script แล้ว");
+  }catch(error){
+    toast("เปิด Script ไม่สำเร็จ: "+error.message);
+  }
+}
+
+async function deleteScript(id){
+  if(!currentUser)return;
+  if(!confirm("ต้องการลบ Script นี้หรือไม่?"))return;
+
+  const script=scripts.find(s=>s.id===id);
+  if(!script)return;
+
+  try{
+    const {data:versions,error:versionError}=await supabaseClient
+      .from("vault_versions")
+      .select("storage_path")
+      .eq("script_id",id);
+
+    if(versionError)throw versionError;
+
+    const paths=[script.storage_path,...(versions||[]).map(v=>v.storage_path)]
+      .filter(Boolean)
+      .filter(path=>path!=="pending");
+
+    if(paths.length){
+      const {error:storageError}=await supabaseClient.storage
+        .from(BUCKET).remove([...new Set(paths)]);
+      if(storageError)throw storageError;
+    }
+
+    const {error}=await supabaseClient
+      .from("vault_scripts").delete().eq("id",id);
+
+    if(error)throw error;
+
+    toast("ลบ Script แล้ว");
+    await loadVault();
+  }catch(error){
+    toast("ลบไม่สำเร็จ: "+error.message);
+  }
+}
+
+/* =====================================
+   VERSION MANAGER
+===================================== */
+
+function updateVersionSelect(){
+  const select=$("versionScript");
+  const old=select.value;
+
+  select.innerHTML='<option value="">-- Select Script --</option>'+
+    scripts.map(s=>`
+      <option value="${s.id}">${escapeHTML(s.title)}</option>
+    `).join("");
+
+  if(scripts.some(s=>s.id===old))select.value=old;
+}
+
+async function insertVersion(scriptId,path,changelog){
+  const {data:existing,error:readError}=await supabaseClient
+    .from("vault_versions")
+    .select("version_number")
+    .eq("script_id",scriptId)
+    .order("version_number",{ascending:false})
+    .limit(1);
+
+  if(readError)throw readError;
+
+  const nextVersion=(existing?.[0]?.version_number||0)+1;
+
+  const {error}=await supabaseClient
+    .from("vault_versions")
+    .insert({
+      script_id:scriptId,
+      owner_id:currentUser.id,
+      version_number:nextVersion,
+      storage_path:path,
+      changelog:changelog||"Saved version"
+    });
+
+  if(error)throw error;
+}
+
+async function addVersion(id){
+  if(!currentUser)return;
+
+  const script=scripts.find(s=>s.id===id);
+  if(!script)return;
+
+  const source=$("editorCode").value;
+  const title=$("editorTitle").value.trim();
+
+  let content=source;
+
+  if(!content.trim()){
+    try{
+      content=await readStorageFile(script.storage_path);
+    }catch(error){
+      toast("ไม่สามารถอ่าน Source เดิมได้");
+      return;
+    }
+  }
+
+  const changelog=prompt("รายละเอียดเวอร์ชันใหม่:","Update");
+  if(changelog===null)return;
+
+  try{
+    const path=makeStoragePath(currentUser.id,id,title||script.title);
+    await uploadSource(path,content);
+    await insertVersion(id,path,changelog);
+
+    const {error}=await supabaseClient
+      .from("vault_scripts")
+      .update({
+        storage_path:path,
+        updated_at:new Date().toISOString()
+      })
+      .eq("id",id);
+
+    if(error)throw error;
+
+    toast("สร้างเวอร์ชันใหม่สำเร็จ");
+    await loadVault();
+    $("versionScript").value=id;
+    showView("versions");
+    await loadVersions();
+  }catch(error){
+    toast("สร้างเวอร์ชันไม่สำเร็จ: "+error.message);
+  }
+}
+
+async function loadVersions(){
+  const id=$("versionScript").value;
+  if(!id){
+    $("versionList").textContent="เลือก Script เพื่อดูเวอร์ชัน";
+    return;
+  }
+
+  $("versionList").textContent="กำลังโหลด...";
+
+  try{
+    const {data,error}=await supabaseClient
+      .from("vault_versions")
+      .select("*")
+      .eq("script_id",id)
+      .order("version_number",{ascending:false});
+
+    if(error)throw error;
+
+    if(!data?.length){
+      $("versionList").textContent="ยังไม่มีประวัติเวอร์ชัน";
+      return;
+    }
+
+    $("versionList").innerHTML=data.map(v=>`
+      <div class="list-item">
+        <div>
+          <b>Version ${escapeHTML(v.version_number)}</b>
+          <div class="muted" style="font-size:11px">
+            ${escapeHTML(v.changelog||"")}
+          </div>
+          <div class="muted" style="font-size:10px">
+            ${new Date(v.created_at).toLocaleString()}
+          </div>
+        </div>
+        <button class="secondary" onclick="restoreVersion('${v.id}')">Open</button>
+      </div>
+    `).join("");
+  }catch(error){
+    $("versionList").textContent="โหลดเวอร์ชันไม่สำเร็จ: "+error.message;
+  }
+}
+
+async function restoreVersion(versionId){
+  try{
+    const {data,error}=await supabaseClient
+      .from("vault_versions")
+      .select("*")
+      .eq("id",versionId)
+      .single();
+
+    if(error)throw error;
+
+    const source=await readStorageFile(data.storage_path);
+    const script=scripts.find(s=>s.id===data.script_id);
+
+    $("editorTitle").value=script?.title||"Restored Script";
+    $("editorDescription").value=script?.description||"";
+    $("editorCode").value=source;
+
+    showView("editor");
+    toast("เปิด Version "+data.version_number+" แล้ว");
+  }catch(error){
+    toast("เปิดเวอร์ชันไม่สำเร็จ: "+error.message);
+  }
+}
+
+/* =====================================
+   EDITOR HELPERS
+===================================== */
+
+function newEditor(){
+  $("editorTitle").value="";
+  $("editorDescription").value="";
+  $("editorCode").value="";
+}
+
+function downloadEditor(){
+  const code=$("editorCode").value;
+  if(!code.trim()){toast("ไม่มี Source Code");return;}
+
+  const name=safeFileName($("editorTitle").value||"HelloHub");
+  const blob=new Blob([code],{type:"text/plain"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download=name+".luau";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function sendEditorToChecker(){
+  $("source").value=$("editorCode").value;
+  showView("checker");
+  scan();
+}
+
+/* =====================================
+   LUАU LIBRARY CHECKER
+===================================== */
+
+const API_LIST=[
+  "CreateWindow","CreateTab","AddSection","AddButton",
+  "AddToggle","AddSlider","AddDropdown","AddLabel",
+  "Notify","SetTheme","Reload","Destroy"
 ];
 
-function addIssue(list,type,title,detail){
-list.push({type,title,detail});
-}
-
 function escapeHTML(s){
-return String(s).replace(/[&<>"']/g,c=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#39;"
-})[c]);
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  })[c]);
 }
-
-/* FILE IMPORT */
 
 $("file").addEventListener("change",async e=>{
-const file=e.target.files[0];
+  const file=e.target.files[0];
+  if(!file)return;
 
-if(!file)return;
+  if(file.size>2*1024*1024){
+    toast("ไฟล์ใหญ่เกิน 2 MB");
+    e.target.value="";
+    return;
+  }
 
-if(file.size>2*1024*1024){
-alert("ไฟล์ใหญ่เกิน 2 MB");
-e.target.value="";
-return;
-}
+  try{$("source").value=await file.text();}
+  catch(error){toast("อ่านไฟล์ไม่ได้");}
 
-try{
-$("source").value=await file.text();
-}catch(error){
-alert("ไม่สามารถอ่านไฟล์ได้");
-}
-
-e.target.value="";
+  e.target.value="";
 });
-
-/* REMOVE COMMENTS AND STRINGS */
 
 function stripCode(src){
+  let out="",i=0,state="normal",longEnd="";
 
-let out="";
-let i=0;
-let state="normal";
-let longEnd="";
+  while(i<src.length){
+    const c=src[i],n=src[i+1];
 
-while(i<src.length){
+    if(state==="normal"){
+      if(c==="-"&&n==="-"){
+        const m=src.slice(i).match(/^\-\-\[(=*)\[/);
+        if(m){
+          state="longcomment";
+          longEnd="]"+m[1]+"]";
+          i+=m[0].length;
+          continue;
+        }
+        state="comment";i+=2;continue;
+      }
 
-const c=src[i];
-const n=src[i+1];
+      if(c==="'"||c==='"'){state=c;out+=" ";i++;continue;}
 
-if(state==="normal"){
+      if(c==="["){
+        const m=src.slice(i).match(/^\[(=*)\[/);
+        if(m){
+          state="longstring";
+          longEnd="]"+m[1]+"]";
+          i+=m[0].length;
+          out+=" ";
+          continue;
+        }
+      }
 
-if(c==="-"&&n==="-"){
+      out+=c;i++;continue;
+    }
 
-const m=src.slice(i).match(/^\-\-\[(=*)\[/);
+    if(state==="comment"){
+      if(c==="\n"){state="normal";out+="\n";}
+      i++;continue;
+    }
 
-if(m){
-state="longcomment";
-longEnd="]"+m[1]+"]";
-i+=m[0].length;
-continue;
+    if(state==="longcomment"||state==="longstring"){
+      if(src.slice(i,i+longEnd.length)===longEnd){
+        i+=longEnd.length;state="normal";out+=" ";continue;
+      }
+      if(c==="\n")out+="\n";
+      i++;continue;
+    }
+
+    if(state==="'"||state==='"'){
+      if(c==="\\"){i+=2;continue;}
+      if(c===state)state="normal";
+      if(c==="\n")out+="\n";
+      i++;
+    }
+  }
+  return out;
 }
 
-state="comment";
-i+=2;
-continue;
+function addIssue(list,type,title,detail){
+  list.push({type,title,detail});
 }
-
-if(c==="'"||c==='"'){
-state=c;
-out+=" ";
-i++;
-continue;
-}
-
-if(c==="["){
-
-const m=src.slice(i).match(/^\[(=*)\[/);
-
-if(m){
-state="longstring";
-longEnd="]"+m[1]+"]";
-i+=m[0].length;
-out+=" ";
-continue;
-}
-}
-
-out+=c;
-i++;
-continue;
-}
-
-if(state==="comment"){
-
-if(c==="\n"){
-state="normal";
-out+="\n";
-}
-
-i++;
-continue;
-}
-
-if(state==="longcomment"||state==="longstring"){
-
-if(src.slice(i,i+longEnd.length)===longEnd){
-i+=longEnd.length;
-state="normal";
-out+=" ";
-continue;
-}
-
-if(c==="\n")out+="\n";
-
-i++;
-continue;
-}
-
-if(state==="'"||state==='"'){
-
-if(c==="\\"){
-i+=2;
-continue;
-}
-
-if(c===state)state="normal";
-
-if(c==="\n")out+="\n";
-
-i++;
-}
-}
-
-return out;
-}
-
-/* BASIC BLOCK INSPECTION */
-
-function scanBlocks(clean,issues){
-
-const tokens=[];
-const pattern=/[A-Za-z_][A-Za-z0-9_]*/g;
-
-let match;
-
-while((match=pattern.exec(clean))!==null){
-
-const word=match[0];
-
-if([
-"function",
-"if",
-"for",
-"while",
-"do",
-"repeat",
-"end",
-"until"
-].includes(word)){
-
-const line=clean
-.slice(0,match.index)
-.split("\n").length;
-
-tokens.push({word,line});
-}
-}
-
-const stack=[];
-
-for(const token of tokens){
-
-const word=token.word;
-
-if(word==="function"||word==="if"){
-
-stack.push({
-type:word,
-line:token.line
-});
-
-continue;
-}
-
-if(word==="for"||word==="while"){
-
-stack.push({
-type:"loop",
-waitingForDo:true,
-line:token.line
-});
-
-continue;
-}
-
-if(word==="do"){
-
-let matchedLoop=false;
-
-for(let i=stack.length-1;i>=0;i--){
-
-if(
-stack[i].type==="loop"&&
-stack[i].waitingForDo
-){
-
-stack[i].waitingForDo=false;
-matchedLoop=true;
-break;
-}
-}
-
-if(!matchedLoop){
-
-stack.push({
-type:"do",
-line:token.line
-});
-}
-
-continue;
-}
-
-if(word==="repeat"){
-
-stack.push({
-type:"repeat",
-line:token.line
-});
-
-continue;
-}
-
-if(word==="end"){
-
-const last=stack[stack.length-1];
-
-if(!last){
-
-addIssue(
-issues,
-"error",
-"พบ end เกิน",
-"บรรทัด "+token.line+
-" ไม่มี Block ที่รอการปิด"
-);
-
-continue;
-}
-
-if(last.type==="repeat"){
-
-addIssue(
-issues,
-"error",
-"พบ end ในบล็อก repeat",
-"repeat ต้องปิดด้วย until"
-);
-
-continue;
-}
-
-stack.pop();
-continue;
-}
-
-if(word==="until"){
-
-const last=stack[stack.length-1];
-
-if(last&&last.type==="repeat"){
-stack.pop();
-}else{
-
-addIssue(
-issues,
-"error",
-"พบ until ไม่ตรงกับ repeat",
-"บรรทัด "+token.line
-);
-}
-}
-}
-
-for(const block of stack){
-
-addIssue(
-issues,
-"warning",
-"อาจพบ Block ที่ยังไม่ปิด",
-block.type+
-" เริ่มต้นที่บรรทัด "+
-block.line
-);
-}
-}
-
-/* BRACKET INSPECTION */
 
 function scanBrackets(clean,issues){
+  const stack=[];
+  const pairs={")":"(","]":"[","}":"{"};
 
-const stack=[];
-const pairs={
-")":"(",
-"]":"[",
-"}":"{"
-};
+  for(let i=0;i<clean.length;i++){
+    const c=clean[i];
+    const line=clean.slice(0,i).split("\n").length;
 
-for(let i=0;i<clean.length;i++){
+    if("([{".includes(c))stack.push({c,line});
 
-const c=clean[i];
+    if(")]}".includes(c)){
+      if(!stack.length||stack[stack.length-1].c!==pairs[c]){
+        addIssue(issues,"error","วงเล็บไม่ตรงกัน",
+          "พบ '"+c+"' บรรทัด "+line);
+      }else stack.pop();
+    }
+  }
 
-const line=clean
-.slice(0,i)
-.split("\n").length;
-
-if("([{".includes(c)){
-
-stack.push({c,line});
+  stack.forEach(x=>addIssue(
+    issues,"error","วงเล็บเปิดค้าง",
+    "พบ '"+x.c+"' บรรทัด "+x.line
+  ));
 }
 
-if(")]}".includes(c)){
+function scanBlocks(clean,issues){
+  const tokens=[];
+  const pattern=/[A-Za-z_][A-Za-z0-9_]*/g;
+  let match;
 
-if(
-!stack.length||
-stack[stack.length-1].c!==pairs[c]
-){
+  while((match=pattern.exec(clean))!==null){
+    const word=match[0];
+    if(["function","if","for","while","do","repeat","end","until"].includes(word)){
+      tokens.push({
+        word,
+        line:clean.slice(0,match.index).split("\n").length
+      });
+    }
+  }
 
-addIssue(
-issues,
-"error",
-"วงเล็บไม่ตรงกัน",
-"พบ '"+c+"' บรรทัด "+line
-);
+  const stack=[];
 
-}else{
+  for(const token of tokens){
+    const word=token.word;
 
-stack.pop();
+    if(word==="function"||word==="if"){
+      stack.push({type:word,line:token.line});
+      continue;
+    }
+
+    if(word==="for"||word==="while"){
+      stack.push({type:"loop",waitingForDo:true,line:token.line});
+      continue;
+    }
+
+    if(word==="do"){
+      let found=false;
+      for(let i=stack.length-1;i>=0;i--){
+        if(stack[i].type==="loop"&&stack[i].waitingForDo){
+          stack[i].waitingForDo=false;
+          found=true;
+          break;
+        }
+      }
+      if(!found)stack.push({type:"do",line:token.line});
+      continue;
+    }
+
+    if(word==="repeat"){
+      stack.push({type:"repeat",line:token.line});
+      continue;
+    }
+
+    if(word==="end"){
+      const last=stack[stack.length-1];
+      if(!last){
+        addIssue(issues,"error","พบ end เกิน",
+          "บรรทัด "+token.line+" ไม่มี Block ที่รอการปิด");
+      }else if(last.type==="repeat"){
+        addIssue(issues,"error","พบ end ในบล็อก repeat",
+          "repeat ต้องปิดด้วย until");
+      }else stack.pop();
+      continue;
+    }
+
+    if(word==="until"){
+      const last=stack[stack.length-1];
+      if(last&&last.type==="repeat")stack.pop();
+      else addIssue(issues,"error","พบ until ไม่ตรงกับ repeat",
+        "บรรทัด "+token.line);
+    }
+  }
+
+  stack.forEach(block=>addIssue(
+    issues,"warning","อาจพบ Block ที่ยังไม่ปิด",
+    block.type+" เริ่มต้นที่บรรทัด "+block.line
+  ));
 }
-}
-}
-
-stack.forEach(x=>{
-
-addIssue(
-issues,
-"error",
-"วงเล็บเปิดค้าง",
-"พบ '"+x.c+"' บรรทัด "+x.line
-);
-});
-}
-
-/* API INSPECTION */
 
 function scanAPI(clean,issues){
+  let found=0;
+  const detected=[];
 
-let found=0;
+  API_LIST.forEach(api=>{
+    if(new RegExp("\\b"+api+"\\b").test(clean)){
+      found++;detected.push(api);
+    }
+  });
 
-const detected=[];
+  if(!/\bCreateWindow\b/.test(clean))
+    addIssue(issues,"error","ไม่พบ CreateWindow","ไม่พบ API สร้างหน้าต่างหลัก");
 
-API_LIST.forEach(api=>{
+  if(!/\bCreateTab\b/.test(clean))
+    addIssue(issues,"warning","ไม่พบ CreateTab","ตรวจสอบ API สร้างแท็บ");
 
-const regex=new RegExp(
-"\\b"+api+"\\b"
-);
+  if(!/\bAddButton\b/.test(clean))
+    addIssue(issues,"warning","ไม่พบ AddButton","ไม่พบ API ปุ่ม");
 
-if(regex.test(clean)){
-found++;
-detected.push(api);
+  if(!/\bAddToggle\b/.test(clean))
+    addIssue(issues,"warning","ไม่พบ AddToggle","ไม่พบ API Toggle");
+
+  if(!/\bDestroy\b/.test(clean))
+    addIssue(issues,"warning","ไม่พบ Destroy","ควรมีระบบ Cleanup UI");
+
+  return{found,detected};
 }
-
-});
-
-if(!/\bCreateWindow\b/.test(clean)){
-
-addIssue(
-issues,
-"error",
-"ไม่พบ CreateWindow",
-"ไม่พบ API สร้างหน้าต่างหลัก"
-);
-}
-
-if(!/\bCreateTab\b/.test(clean)){
-
-addIssue(
-issues,
-"warning",
-"ไม่พบ CreateTab",
-"ตรวจสอบ API สร้างแท็บ"
-);
-}
-
-if(!/\bAddButton\b/.test(clean)){
-
-addIssue(
-issues,
-"warning",
-"ไม่พบ AddButton",
-"ไม่พบ API ปุ่ม"
-);
-}
-
-if(!/\bAddToggle\b/.test(clean)){
-
-addIssue(
-issues,
-"warning",
-"ไม่พบ AddToggle",
-"ไม่พบ API Toggle"
-);
-}
-
-if(!/\bDestroy\b/.test(clean)){
-
-addIssue(
-issues,
-"warning",
-"ไม่พบ Destroy",
-"ควรมีระบบ Cleanup UI"
-);
-}
-
-return{
-found,
-detected
-};
-}
-
-/* MAIN SCAN */
 
 function scan(){
+  const code=$("source").value;
+  if(!code.trim()){toast("กรุณาวางโค้ดก่อน");return;}
 
-const code=$("source").value;
+  const issues=[];
+  const clean=stripCode(code);
 
-if(!code.trim()){
-alert("กรุณาวางโค้ดหรือเลือกไฟล์ก่อน");
-return;
+  scanBrackets(clean,issues);
+  const apiResult=scanAPI(clean,issues);
+  scanBlocks(clean,issues);
+
+  if(/\bloadstring\s*\(/.test(clean))
+    addIssue(issues,"warning","พบ loadstring","ตรวจสอบความจำเป็นและความปลอดภัย");
+
+  if(/\bHttpGet\s*\(/.test(clean))
+    addIssue(issues,"warning","พบ HttpGet","ตรวจสอบแหล่งที่มาของโค้ด");
+
+  if(!issues.length)
+    addIssue(issues,"ok","ไม่พบปัญหาเบื้องต้น",
+      "ผ่านการตรวจสอบ Static Inspection เบื้องต้น");
+
+  const errors=issues.filter(x=>x.type==="error").length;
+  const warnings=issues.filter(x=>x.type==="warning").length;
+  const status=errors?"ERROR":warnings?"WARNING":"OK";
+
+  $("statusCard").textContent=status;
+  $("statusCard").style.color=errors?"var(--red)":warnings?"var(--yellow)":"var(--green)";
+  $("issueCount").textContent=errors+warnings;
+  $("apiCount").textContent=apiResult.found+" / "+API_LIST.length;
+  $("dashChecker").textContent=status;
+  $("checkerResults").classList.remove("hidden");
+
+  const badge=$("resultBadge");
+  badge.textContent=status;
+  badge.className="pill "+(errors?"bad":warnings?"warn":"good");
+
+  $("reportSummary").textContent=
+    "Errors: "+errors+" · Warnings: "+warnings+
+    " · Detected APIs: "+apiResult.found+"/"+API_LIST.length+
+    " · "+(apiResult.detected.join(", ")||"ไม่มี");
+
+  $("report").innerHTML=issues.map(x=>{
+    const color=x.type==="error"?"var(--red)":x.type==="warning"?"var(--yellow)":"var(--green)";
+    return `<div class="issue">
+      <b style="color:${color}">${escapeHTML(x.title)}</b>
+      <span class="muted">${escapeHTML(x.detail)}</span>
+    </div>`;
+  }).join("");
+
+  lastReport=[
+    "HelloHub Library Checker",
+    "Status: "+status,
+    "Errors: "+errors,
+    "Warnings: "+warnings,
+    "Detected APIs: "+apiResult.found+"/"+API_LIST.length,
+    "",
+    ...issues.map(x=>x.type.toUpperCase()+": "+x.title+" - "+x.detail)
+  ].join("\n");
 }
 
-const issues=[];
-
-const clean=stripCode(code);
-
-scanBrackets(clean,issues);
-
-const apiResult=scanAPI(clean,issues);
-
-scanBlocks(clean,issues);
-
-if(/\bloadstring\s*\(/.test(clean)){
-
-addIssue(
-issues,
-"warning",
-"พบ loadstring",
-"ตรวจสอบความจำเป็นและความปลอดภัย"
-);
+function clearChecker(){
+  $("source").value="";
+  $("checkerResults").classList.add("hidden");
+  $("statusCard").textContent="NOT CHECKED";
+  $("statusCard").style.color="";
+  $("issueCount").textContent="0";
+  $("apiCount").textContent="0 / 12";
+  $("dashChecker").textContent="Ready";
+  lastReport="";
 }
-
-if(/\bHttpGet\s*\(/.test(clean)){
-
-addIssue(
-issues,
-"warning",
-"พบ HttpGet",
-"ตรวจสอบแหล่งที่มาของโค้ด"
-);
-}
-
-if(!issues.length){
-
-addIssue(
-issues,
-"ok",
-"ไม่พบปัญหาเบื้องต้น",
-"ผ่านการตรวจสอบแบบ Static Inspection เบื้องต้น"
-);
-}
-
-const errors=issues.filter(
-x=>x.type==="error"
-).length;
-
-const warnings=issues.filter(
-x=>x.type==="warning"
-).length;
-
-const status=
-errors?"ERROR":
-warnings?"WARNING":"OK";
-
-$("statusCard").textContent=status;
-
-$("statusCard").style.color=
-errors?"var(--red)":
-warnings?"var(--yellow)":
-"var(--green)";
-
-$("issueCount").textContent=errors+warnings;
-
-$("apiCount").textContent=
-apiResult.found+" / "+API_LIST.length;
-
-$("results").style.display="block";
-
-const badge=$("resultBadge");
-
-badge.textContent=status;
-
-badge.className="pill "+
-(
-errors?"error":
-warnings?"warn":"ok"
-);
-
-$("reportSummary").textContent=
-"Errors: "+errors+
-" · Warnings: "+warnings+
-" · Detected APIs: "+apiResult.found+
-"/"+API_LIST.length+
-" · ตรวจพบ API: "+
-(apiResult.detected.join(", ")||"ไม่มี");
-
-$("report").innerHTML=issues.map(x=>{
-
-const color=
-x.type==="error"?"var(--red)":
-x.type==="warning"?"var(--yellow)":
-"var(--green)";
-
-return `
-<div class="issue">
-<b style="color:${color}">
-${escapeHTML(x.title)}
-</b>
-<small>${escapeHTML(x.detail)}</small>
-</div>
-`;
-
-}).join("");
-
-lastReport=[
-"HelloHub Library Checker v1.2",
-"Status: "+status,
-"Errors: "+errors,
-"Warnings: "+warnings,
-"Detected APIs: "+
-apiResult.found+"/"+API_LIST.length,
-"Detected: "+apiResult.detected.join(", "),
-"Inspection: Heuristic Static Inspection",
-"",
-...issues.map(x=>
-x.type.toUpperCase()+
-": "+x.title+" - "+x.detail
-)
-].join("\n");
-}
-
-/* CLEAR */
-
-function clearAll(){
-
-$("source").value="";
-$("results").style.display="none";
-
-$("statusCard").textContent="NOT CHECKED";
-$("statusCard").style.color="";
-
-$("issueCount").textContent="0";
-$("apiCount").textContent="0 / 12";
-
-lastReport="";
-}
-
-/* COPY REPORT */
 
 async function copyReport(){
-
-if(!lastReport)return;
-
-try{
-
-await navigator.clipboard.writeText(lastReport);
-
-alert("คัดลอกรายงานแล้ว");
-
-}catch(e){
-
-const temp=document.createElement("textarea");
-
-temp.value=lastReport;
-document.body.appendChild(temp);
-
-temp.select();
-
-try{
-document.execCommand("copy");
-alert("คัดลอกรายงานแล้ว");
-}catch(error){
-alert("คัดลอกไม่ได้");
+  if(!lastReport)return;
+  try{
+    await navigator.clipboard.writeText(lastReport);
+    toast("คัดลอกรายงานแล้ว");
+  }catch(error){
+    toast("คัดลอกไม่ได้");
+  }
 }
 
-temp.remove();
+/* =====================================
+   STARTUP
+===================================== */
+
+async function init(){
+  try{
+    await updateAuthUI();
+  }catch(error){
+    $("connectionStatus").textContent="● Connection Error";
+    $("connectionStatus").style.color="var(--red)";
+    toast("Supabase: "+error.message);
+  }
 }
-}
+
+init();
 </script>
 
 </body>
